@@ -11,7 +11,7 @@ This expects to find a zookeeper machine running at 127.0.0.1
 
     docker run -ti --rm --net=host jplock/zookeeper
 
-    You can also specify the address of the zookeeper machines by running the
-    midonet-agent container with
+You can also specify the address of the zookeeper machines by running the
+midonet-agent container with
 
-        -e MIDO_ZOOKEEPER_HOSTS=addr:port
+    -e MIDO_ZOOKEEPER_HOSTS=addr:port
