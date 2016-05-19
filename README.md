@@ -1,2 +1,2 @@
 # midonet-docker
-Dockerfiles of MidoNet tools
+Dockerfiles of MidoNet components
