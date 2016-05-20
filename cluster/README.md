@@ -13,6 +13,7 @@ docker run -d --name cluster \
   -e KEYSTONE_HOST=172.17.0.81 \
   -e KEYSTONE_PORT=35357 \
   -e KEYSTONE_ADMIN_TOKEN="ADMIN" \
+  -e UUID="a293fed0-f7dc-40e6-b01d-c688cfa02429" \
   -v ${HOME}/logs:/var/log/midonet-cluster \
    midonet/cluster
 ```
@@ -26,5 +27,9 @@ where
 * KEYSTONE\_PORT is the port under which the Keystone service is offered.
 * KEYSTONE\_ADMIN\_TOKEN is the token that the Cluster will use to authenticate
   itself with keystone and it must belong to an admin role.
+* UUID is an optional environment variable that allows you to spawn a container
+  that is identified with that uuid. If you tear it down and start it again
+  with the same UUID, it will take the place and configurations of the previous
+  one. If it is not passed, each container run will get a new uuid.
 * A volume is mounted to have the Cluster logs available in the host without
   having to enter the container.
