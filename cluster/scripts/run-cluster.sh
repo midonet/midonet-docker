@@ -36,4 +36,8 @@ else
     echo "Using MockAuth provider instead of keystone as no container was linked."
 fi
 
+if [ "$UUID" != "" ]; then
+    echo "host_uuid=$UUID" > /etc/midonet_host_id.properties
+fi
+
 sh /usr/share/midonet-cluster/midonet-cluster-start

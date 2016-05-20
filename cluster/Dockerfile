@@ -20,7 +20,7 @@ RUN set -xe \
   && apt-get -qy remove --auto-remove software-properties-common \
   && rm -fr /var/lib/apt/lists/* /etc/apt/sources.list.d/*
 
-ADD scripts/run-cluster.sh /bin/run-cluster.sh
+ADD scripts/run-cluster.sh /cluster
 
 EXPOSE 8181
 
@@ -30,7 +30,8 @@ ENV KEYSTONE_HOST="127.0.0.1"
 ENV KEYSTONE_PORT=35357
 ENV KEYSTONE_TENANT_NAME="admin"
 ENV KEYSTONE_ADMIN_TOKEN="admintoken"
+ENV UUID=""
 
 VOLUME /var/log/midonet-cluster
 
-CMD ["/bin/run-cluster.sh"]
+CMD ["/cluster"]
