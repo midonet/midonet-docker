@@ -18,7 +18,7 @@ docker run -d --name cluster \
    midonet/cluster
 ```
 
-where
+where:
 
 * ZK\_ENDPOINTS is a comma separated list of all the ip:ports serving
   Apache Zookeeper.
@@ -33,3 +33,12 @@ where
   one. If it is not passed, each container run will get a new uuid.
 * A volume is mounted to have the Cluster logs available in the host without
   having to enter the container.
+
+Other available options:
+* AGENT\_LOG\_LEVEL: which allows you to change the logging level that is used
+  by the MidoNet agents in the cluster. It defaults to 'INFO'.
+* C\_SERVERS: the comma-separated IPs of the cassandra servers in the cluster.
+  If it is not provided, some MidoNet features like flow tracing will be
+  disabled.
+* C\_FACTOR: The Cassandra replication factor that the MidoNet agents in the
+  cluster will use when writing to the Cassandra cluster.

@@ -32,6 +32,11 @@ ENV KEYSTONE_TENANT_NAME="admin"
 ENV KEYSTONE_ADMIN_TOKEN="admintoken"
 ENV UUID=""
 
+# Agent-related cluster level configuration
+ENV AGENT_LOG_LEVEL="INFO"
+ENV C_FACTOR=3
+ENV C_SERVERS=""
+
 VOLUME /var/log/midonet-cluster
 
 CMD ["/cluster"]
