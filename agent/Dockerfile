@@ -1,22 +1,39 @@
-FROM gliderlabs/alpine
-MAINTAINER Antoni Segura Puimedon "toni@midokura.com"
-WORKDIR /
-RUN apk add --no-cache \
-    bash \
-    bridge-utils \
-    haproxy \
-    openjdk8 \
-    quagga && \
-    apk add --no-cache --virtual build-deps \
-        curl \
-        tar \
-        xz && \
-    curl http://119.15.120.38:8000/midolman_5.2-201603111652.c6374cb.tar.xz | tar xJvf - && \
-    curl http://119.15.120.38:8000/midonet-tools-5.2-201603111652.c6374cb.tar.xz | tar xJvf - && \
-    apk del build-deps
+FROM ubuntu:14.04
+MAINTAINER MidoNet (https://www.midonet.org)
 
-ADD scripts/run-midolman.sh /run-midolman.sh
+ADD conf/midonet.list /etc/apt/sources.list.d/midonet.list
 
-ENV MIDO_ZOOKEEPER_HOSTS="127.0.0.1:2181" MIDO_ZOOKEEPER_ROOT_KEY="/midonet"
+RUN set -xe \
+  \
+  && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv \
+  E9996503AEB005066261D3F38DDA494E99143E75 \
+  && apt-get -qy update \
+  && apt-get -qy dist-upgrade \
+  \
+  && apt-get -qy install software-properties-common \
+  && add-apt-repository -y ppa:openjdk-r/ppa \
+  && apt-get -qy update \
+  && apt-get -qy install openjdk-8-jre-headless --no-install-recommends \
+  \
+  && apt-get -qy install midolman \
+  \
+  && apt-get -qy remove --auto-remove software-properties-common \
+  && rm -fr /var/lib/apt/lists/* /etc/apt/sources.list.d/* \
+  \
+  && cp /etc/midolman/midolman-env.sh.compute.large \
+  /etc/midolman/midolman-env.sh \
+  && rm /etc/midolman/midolman-env.sh.*
 
-CMD ["/run-midolman.sh"]
+
+ADD scripts/run-midolman.sh /agent
+
+# Expose bgpd port in case it is a gateway
+EXPOSE 179
+
+ENV ZK_ENDPOINTS="127.0.0.1:2181"
+ENV TEMPLATE="compute.large"
+ENV UUID=""
+
+VOLUME /var/log/midolman
+
+CMD ["/agent"]

@@ -1,17 +1,34 @@
 # MidoNet Host Agent
 
-## Usage
+This container is designed to interact with a Zookeeper cluster that is managed
+by a MidoNet Cluster.
 
-This container is designed to run in the host network namespace. Make sure that
-the host hostname is resolvable and then run:
+## How to run it
 
-    docker run --net=host -ti --cap-add=NET_ADMIN celebdor/midonet-agent:master
+An example command line is:
 
-This expects to find a zookeeper machine running at 127.0.0.1
+```bash
+docker run -d --name agent --net=host \
+  --cap-add=NET_ADMIN \
+  -e ZK_ENDPOINTS=172.17.0.14:2181,172.17.0.15:2181 \
+  -e UUID=e967e5c2-3579-41d2-8a1b-4391ea40b0f3 \
+  -v ${HOME}/logs/midonet_agent:/var/log/midolman \
+  midonet/agent:latest
+```
 
-    docker run -ti --rm --net=host jplock/zookeeper
+where:
 
-You can also specify the address of the zookeeper machines by running the
-midonet-agent container with
+* ZK\_ENDPOINTS is a comma-separated list of all the ip:ports serving
+  Apache Zookeeper.
+* UUID is an optional environment variable that allows you to spawn a container
+  that is identified with that uuid. If you tear it down and start it again
+  with the same UUID, it will take the place and configurations of the previous
+  one. If it is not passed, each container run will get a new uuid.
+* A volume is mounted to have the Cluster logs available in the host without
+  having to enter the container.
 
-    -e MIDO_ZOOKEEPER_HOSTS=addr:port
+Other available options:
+* TEMPLATE is one of compute.large (default), compute.medium, gateway.large and
+  gateway.medium. It is recommended to keep the default template for all the
+  agents except for the gateway nodes, where you should pick one of the gatewa
+  template options.
