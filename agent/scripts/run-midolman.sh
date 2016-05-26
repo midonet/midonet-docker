@@ -1,5 +1,6 @@
 #!/bin/sh
 
+HOST_ID_FILE="/etc/midonet_host_id.properties"
 
 # If the user did not mount a volume with configuration, we create it from
 # environment variables
@@ -13,7 +14,7 @@ fi
 rm /usr/bin/wdog
 
 # Do not write things to /etc if the user mounted his own config
-if [ "$(stat -c '%m' /etc/midonet_host_id.properties)" = "/" ]; then
+if [ ! -f $HOST_ID_FILE ] || [ "$(stat -c '%m' "$HOST_ID_FILE")" = "/" ]; then
 
     # if a UUID was not supplied, we'll get a new one with each `docker run`
     if [ "$UUID" != "" ]; then
