@@ -34,6 +34,24 @@ Other available options:
 * PASSWORD is the password for the above USERNAME. (Default "admin").
 * PROJECT is the Keystone project for the above USERNAME. (Default "admin").
 
+#### Making it easier:
+
+If you want to avoid typing the docker run and env vars everytime, you can
+create something like the following:
+
+```bash
+cat > ~/bin/midonet-cli << EOF
+#!/bin/sh
+
+docker run --rm \
+  -e CLUSTER_URL=http://172.17.0.7:8181/midonet-api \
+  midonet/utils cli "\$@"
+EOF
+chmod +x ~/bin/midonet-cli
+```
+
+After this, you can just call midonet-cli.
+
 ### mn-conf
 
 An example non-interactive command line is:
@@ -51,3 +69,21 @@ where:
   and set specific local configuration for that host.
 * You can also mount an /etc/midonet volume to provide the above configurations
   instead
+
+#### Making it easier:
+
+If you want to avoid typing the docker run and env vars everytime, you can
+create something like the following:
+
+```bash
+cat > ~/bin/mn-conf << EOF
+#!/bin/sh
+
+docker run -ti --rm \
+  -e ZK_ENDPOINTS=172.17.0.6:2181,172.17.0.5:2181,172.17.0.4:2182 \
+  midonet/utils conf "\$@"
+EOF
+chmod +x ~/bin/mn-conf
+```
+
+After this, you can just call mn-conf.
