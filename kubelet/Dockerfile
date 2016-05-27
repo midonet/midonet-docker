@@ -41,5 +41,8 @@ RUN apt-get -qy update \
 # Set ENV VARS
 ENV ZK_ENDPOINTS="127.0.0.1:2181"
 ENV UUID=""
+ENV RUN_API=""
+ENV RUN_ETCD=""
+ENV K8S_API="http://localhost:8080"
 
 CMD ["/kubelet"]
