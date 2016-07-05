@@ -13,6 +13,7 @@ An example command line is:
 docker run -d --name kubelet \
   -e ZK_ENDPOINTS=172.17.0.83:2181,172.17.0.83:2181,172.17.0.85:2182 \
   -e UUID="a293fed0-f7dc-40e6-b01d-c688cfa02429" \
+  -e MASTER_IP="10.11.0.2" \
   --pid=host \
   --net=host \
   --privileged=true \
@@ -33,6 +34,7 @@ where:
   that is identified with that uuid. If you tear it down and start it again
   with the same UUID, it will take the place and configurations of the previous
   one. If it is not passed, each container run will get a new uuid.
+* MASTER\_IP is the Kubernetes API server IP.
 * It is prepared to run at host level because it spawns another docker
   containers (no docker-in-docker considered yet). So the `pid` and the `net`
   should be defined at host level, and several volumes *MUST* be mounted. The only
