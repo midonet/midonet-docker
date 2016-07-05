@@ -28,4 +28,4 @@ if [ ! -f ${HOST_ID_FILE} ] || [ "$(stat -c '%m' ${HOST_ID_FILE})" = "/" ]; then
     echo "host_uuid=$UUID" > ${HOST_ID_FILE}
 fi
 
-/hyperkube kubelet --network-plugin=cni --hostname-override='127.0.0.1' --address='0.0.0.0' --api-servers=http://localhost:8080 --cluster-dns=10.0.0.10 --cluster-domain=cluster.local --config=/etc/kubernetes/manifests --allow-privileged=true --v=2
+/hyperkube kubelet --network-plugin=cni --hostname-override='127.0.0.1' --address='0.0.0.0' --api-servers=http://localhost:8080 --config=/etc/kubernetes/manifests --allow-privileged=true --v=2
