@@ -1,4 +1,4 @@
-FROM gcr.io/google_containers/hyperkube-amd64:v1.2.4
+FROM gcr.io/google_containers/hyperkube-amd64:v1.3.0
 MAINTAINER MidoNet (http://midonet.org)
 
 # We don't need the kube-proxy
