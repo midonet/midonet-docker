@@ -1,9 +1,6 @@
 FROM gcr.io/google_containers/hyperkube-amd64:v1.3.0
 MAINTAINER MidoNet (http://midonet.org)
 
-# We don't need the kube-proxy
-RUN rm /etc/kubernetes/manifests/kube-proxy.json
-
 # MidoNet configuration files
 ADD conf/midonet.list /etc/apt/sources.list.d/midonet.list
 ADD conf/kuryr.conf /usr/libexec/kubernetes/kubelet-plugins/net/exec/kuryr.conf
@@ -39,6 +36,7 @@ RUN apt-get -qy update \
     && rm -fr /var/lib/apt/lists/* /etc/apt/sources.list.d/*
 
 # Set ENV VARS
+ENV MASTER_IP="127.0.0.1"
 ENV ZK_ENDPOINTS="127.0.0.1:2181"
 ENV UUID=""
 
