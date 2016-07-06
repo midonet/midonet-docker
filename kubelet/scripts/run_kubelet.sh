@@ -31,7 +31,7 @@ fi
 /hyperkube kubelet \
   --allow-privileged=true \
   --api-servers="http://${MASTER_IP}:8080" \
-  --v=2
+  --v=2 \
   --address='0.0.0.0' \
   --enable-server \
   --containerized \
