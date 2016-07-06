@@ -3,8 +3,10 @@
 mkdir -p /etc/kuryr/
 cat << EOF > /etc/kuryr/kuryr.conf
 [DEFAULT]
+bindir = /opt/kuryr/usr/libexec/kuryr
 
-bindir = /usr/local/lib/python3.4/dist-packages/usr/libexec/kuryr
+[k8s]
+api_root = http://${MASTER_IP}:8080
 EOF
 
 HOST_ID_FILE='/etc/midonet_host_id.properties'
