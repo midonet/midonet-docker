@@ -10,12 +10,12 @@ RUN set -xe \
   && apt-get -qy update \
   && apt-get -qy dist-upgrade \
   \
-  && apt-get -qy install software-properties-common \
+  && apt-get -qy install software-properties-common --no-install-recommends \
   && add-apt-repository -y ppa:openjdk-r/ppa \
   && apt-get -qy update \
   && apt-get -qy install openjdk-8-jre-headless --no-install-recommends \
   \
-  && apt-get -qy install midolman \
+  && apt-get -qy install midolman --no-install-recommends \
   \
   && apt-get -qy remove --auto-remove software-properties-common \
   && rm -fr /var/lib/apt/lists/* /etc/apt/sources.list.d/* \
