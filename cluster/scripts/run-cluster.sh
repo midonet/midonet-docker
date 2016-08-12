@@ -22,7 +22,7 @@ EOF
 
 if [ -n "$KEYSTONE_HOST" ] && [ -n "$KEYSTONE_PORT" ]; then
     echo "Keystone environment variables were set. Setting up Keystone"
-    AUTH_CONF=$(cat <<'END_OF_HEREDOC'
+    AUTH_CONF=$(cat <<EOF
 cluster.auth {
     provider_class: org.midonet.cluster.auth.keystone.KeystoneService
     admin_role: admin
@@ -32,7 +32,7 @@ cluster.auth {
     keystone.port: $KEYSTONE_PORT
 }
 
-END_OF_HEREDOC
+EOF
 )
 else
     echo "Using MockAuth provider instead of keystone as no container was linked."
@@ -40,14 +40,14 @@ fi
 
 if [ "$C_SERVERS" != "" ]; then
     echo "Configuring Cassandra for this MidoNet cluster..."
-    C_CONF=$(cat <<'END_OF_HEREDOC'
+    C_CONF=$(cat << EOF
 cassandra {
     servers: "$C_SERVERS"
     replication_factor: $C_FACTOR
     cluster: midonet
 }
 
-END_OF_HEREDOC
+EOF
 )
 else
     echo "No Cassandra configuration. It won't be configured."
@@ -85,8 +85,9 @@ echo "Setting up the cluster configuration..."
         }
     }
 
-    "$AUTH_CONF"
-    "$C_CONF"
+    $AUTH_CONF
+
+    $C_CONF
 EOF
 
 
