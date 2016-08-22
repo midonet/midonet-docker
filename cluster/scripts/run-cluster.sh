@@ -20,6 +20,13 @@ mn-conf set -t default << EOF
 cassandra.replication_factor: $CASSANDRA_FACTOR
 EOF
 
+#If specified, the keystone url has precende over host and port
+if [ ! -z "$KEYSTONE_URL" ]; then
+   KS_HOST_AND_PORT=$(echo "$KEYSTONE_URL" | sed -e 's|^.*://||' | sed -e 's|/.*||')
+   KEYSTONE_HOST=$(echo "$KS_HOST_AND_PORT" | cut -d ':' -f 1)
+   KEYSTONE_PORT=$(echo "$KS_HOST_AND_PORT" | cut -d ':' -f 2)
+fi
+
 if [ -n "$KEYSTONE_HOST" ] && [ -n "$KEYSTONE_PORT" ]; then
     echo "Keystone environment variables were set. Setting up Keystone"
     AUTH_CONF=$(cat <<EOF
