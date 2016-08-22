@@ -1,0 +1,2 @@
+# Default plugin to load with neutron (midonet)
+NEUTRON_PLUGIN_CONFIG="/etc/neutron/plugins/midonet/midonet.ini"
