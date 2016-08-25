@@ -1,7 +1,7 @@
 
 # Neutron LBAAS Dockerfile
 
-Dockerfile for a OpenStack Neutron LBAAS agent.
+Dockerfile for a Midonet LBAAS agent for OpenStack Neutron.
 
 The service uses RabbitMQ as rpc backend.
 
