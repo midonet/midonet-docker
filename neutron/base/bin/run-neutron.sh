@@ -50,6 +50,8 @@ allow_overlapping_ips = True
 [MIDONET]
 username = $MN_USERNAME
 password = $MN_PASSWORD
+project_id = $MN_PROJECT
+auth_url = $OS_AUTH_URI
 midonet_uri = $MN_URI
 
 [database]

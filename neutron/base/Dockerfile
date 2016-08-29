@@ -41,8 +41,9 @@ ENV OS_VERBOSE='false'     \
     OS_DEBUG='False'   \
     OS_VERBOSE=False   \
 #For Midonet
-    MN_USERNAME='admin'     \
-    MN_PASSWORD='admin'     \
+    MN_USERNAME='netron'      \
+    MN_PASSWORD='neutron'     \
+    MN_PROJECT='service'      \
     MN_URI='http://127.0.0.1:8181/midonet-api'
 
 CMD ["/run-neutron.sh"]
