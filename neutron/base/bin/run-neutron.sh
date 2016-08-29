@@ -15,8 +15,6 @@ debug=$OS_DEBUG
 log_dir = /var/log/neutron
 log_file = neutron.log
 
-core_plugin = ml2
-
 auth_strategy = keystone
 
 rpc_backend = rabbit
