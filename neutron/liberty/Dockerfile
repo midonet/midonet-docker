@@ -3,7 +3,6 @@ MAINTAINER MidoNet (http://midonet.org)
 
 COPY conf/cloudarchive-ost.list /etc/apt/sources.list.d/cloudarchive-ost.list
 COPY conf/midonet-plugin.list /etc/apt/sources.list.d/midonet-plugin.list
-COPY conf/midonet.ini /etc/neutron/plugins/midonet/midonet.ini
 
 RUN apt-get install -qy ubuntu-cloud-keyring
 RUN apt-get -q update
