@@ -11,7 +11,7 @@ RUN chmod +x /run-zookeeper.sh
 # Expose all zookeeper ports
 EXPOSE 2181 2888 3888
 
-NV ZK_QUORUM="localhost:1" \
+ENV ZK_QUORUM="localhost:1" \
     ZK_ID=1                 \
     ZK_IN_MEM="false"       \
     ZK_SYNC="no"
