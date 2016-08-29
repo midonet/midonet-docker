@@ -15,8 +15,6 @@ debug=$OS_DEBUG
 log_dir = /var/log/neutron
 log_file = neutron.log
 
-core_plugin = ml2
-
 auth_strategy = keystone
 
 rpc_backend = rabbit
@@ -75,4 +73,6 @@ neutron-db-manage --config-file /etc/neutron/neutron.conf \
 neutron-db-manage --config-file /etc/neutron/plugins/midonet/midonet.ini \
                    --subproject networking-midonet upgrade head
 
-neutron-server
+neutron-server --config-file /etc/neutron/neutron.conf \
+               --config-file /etc/neutron/plugins/midonet/midonet.ini
+

@@ -1,6 +1,8 @@
 FROM ubuntu-upstart:14.04
 MAINTAINER MidoNet (http://midonet.org)
 
+RUN mkdir -p /etc/neutron/plugins/midonet
+
 COPY conf/midonet.list /etc/apt/sources.list.d/midonet.list
 COPY conf/keystonerc /keystonerc
 COPY conf/midonetrc /root/.midonetrc
