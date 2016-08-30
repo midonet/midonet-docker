@@ -19,6 +19,9 @@ auth_strategy = keystone
 
 rpc_backend = rabbit
 
+core_plugin = midonet.neutron.plugin_v2.MidonetPluginV2
+service_plugins = lbaas,midonet.neutron.services.l3.l3_midonet.MidonetL3ServicePlugin,midonet.neutron.services.firewall.plugin.MidonetFirewallPlugin
+a
 [keystone_authtoken]
 auth_plugin = password
 project_name = $OS_TENANT_NAME
@@ -37,15 +40,9 @@ rabbit_password = $RB_PASSWORD
 
 EOF
 
-cat > /etc/default/neutron-server <<EOF
-NEUTRON_PLUGIN_CONFIG="/etc/neutron/plugins/midonet/midonet.ini"
-EOF
-
 cat > /etc/neutron/plugins/midonet/midonet.ini <<EOF
 [DEFAULT]
-core_plugin = midonet.neutron.plugin_v2.MidonetPluginV2
-service_plugins = lbaas,midonet.neutron.services.l3.l3_midonet.MidonetL3ServicePlugin,midonet.neutron.services.firewall.plugin.MidonetFirewallPlugin
-allow_overlapping_ips = True
+llow_overlapping_ips = True
 
 [MIDONET]
 username = $MN_USERNAME
@@ -59,6 +56,10 @@ connection = mysql+mysqlconnector://$DB_USERNAME:$DB_PASSWORD@$DB_HOST/$DB_NAME
 
 EOF
 
+cat > /etc/neutron/neutron_lbaas.conf <<EOF
+[DEFAULT]
+service_provider = LOADBALANCER:Haproxy:neutron_lbaas.services.loadbalancer.drivers.haproxy.plugin_driver.HaproxyOnHostPluginDriver:default
+EOF
 
 cat > keystonerc << EOF
 export OS_TENANT_NAME=$OS_TENANT_NAME
@@ -76,5 +77,6 @@ neutron-db-manage --config-file /etc/neutron/plugins/midonet/midonet.ini \
                    --subproject networking-midonet upgrade head
 
 neutron-server --config-file /etc/neutron/neutron.conf \
-               --config-file /etc/neutron/plugins/midonet/midonet.ini
+               --config-file /etc/neutron/plugins/midonet/midonet.ini \
+               --config-file /etc/neutron/neutron_lbaas.conf
 
