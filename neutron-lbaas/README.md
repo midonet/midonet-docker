@@ -11,6 +11,12 @@ services and from client applications.
 The *run-lbaas-agent.sh* script creates the minimal configuration
 files /etc/neutron/neutron.conf.
 
+The container must run in privileged mode.
+
+Addionally, the container requires the volume "/var/run/midolman" to be
+mounted to allow communication with the midonet agent by means of a system 
+socket.
+
 ## Environment Variables
 
 The container receives multiple environment variables that are used to
