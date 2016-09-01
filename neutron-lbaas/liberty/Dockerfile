@@ -23,7 +23,6 @@ RUN apt-get install -qy --no-install-recommends \
     neutron-lbaas-agent \
     python-networking-midonet
 
-COPY conf/neutron.conf /etc/neutron/neutron.conf
 COPY bin/run-lbaas-agent.sh /run-lbaas-agent.sh
 
 RUN wget https://raw.githubusercontent.com/midonet/midonet/staging/v5.2/midolman/src/deb/bin/mm-ctl -O /usr/bin/mm-ctl
