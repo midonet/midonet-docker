@@ -18,6 +18,12 @@ log_dir = /var/log/keystone
 connection = mysql://$DB_USER:$DB_PASSWORD@$DB_HOST/$DB_NAME
 EOF
 
+
+while ! nc -z $DB_HOST 3306; do
+    /bin/sleep 3;
+    echo "MariaDB not running yet at host ${DB_HOST}"
+done
+
 keystone-manage --log-file=/var/log/keystone.log db_sync
 
 python /usr/bin/keystone-all --config-file=/etc/keystone/keystone.conf --log-file=/var/log/keystone.log

@@ -67,6 +67,11 @@ export OS_AUTH_URL=$OS_AUTH_URL
 export OS_AUTH_URI=$OS_AUTH_URI
 EOF
 
+while ! nc -z $DB_HOST 3306; do
+    /bin/sleep 3;
+    echo "MariaDB not running yet at host ${DB_HOST}"
+done
+
 neutron-db-manage --config-file /etc/neutron/neutron.conf \
                    --config-file /etc/neutron/plugins/midonet/midonet.ini \
                                       upgrade head
