@@ -39,5 +39,6 @@ RUN apt-get -qy update \
 ENV MASTER_IP="127.0.0.1"
 ENV ZK_ENDPOINTS="127.0.0.1:2181"
 ENV UUID=""
+ENV PUBLIC_IP=""
 
 CMD ["/kubelet"]

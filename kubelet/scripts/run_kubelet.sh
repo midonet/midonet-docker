@@ -30,11 +30,16 @@ if [ ! -f ${HOST_ID_FILE} ] || [ "$(stat -c '%m' ${HOST_ID_FILE})" = "/" ]; then
     echo "host_uuid=$UUID" > ${HOST_ID_FILE}
 fi
 
+#if public ip is specified, pass as host name for kubelet
+if [ ! -z ${PUBLIC_IP} ];then
+  HOSTNAME_OVERRIDE="--hostname_override=$PUBLIC_IP"
+fi
+
 /hyperkube kubelet \
   --allow-privileged=true \
   --api-servers="http://${MASTER_IP}:8080" \
   --v=2 \
-  --address='0.0.0.0' \
+  --address='0.0.0.0' $HOSTNAME_OVERRIDE \
   --enable-server \
   --containerized \
   --network-plugin=cni
