@@ -1,9 +1,7 @@
 # Hyperkube Kubelet
 
-This container runs a Kubelet container which, in turns, spawns the rest of
-Kubernetes services (api, etcd) to have an inmediate suite of K8s to be used.
-It is configured to be used by MidoNet with Neutron, by configuring the Kuryr's
-CNI driver and the `mm-ctl` utility to bind containers.
+This container runs a Kubelet agent configured to be used Kuryr's
+CNI driver to bind containers to network ports provided by midonet.
 
 ## How to run it
 
@@ -18,7 +16,7 @@ docker run -d --name kubelet \
   --pid=host \
   --net=host \
   --privileged=true \
-  -v ${HOME}/logs:/var/log/midonet-cluster \
+  -v ${HOME}/logs:/var/log/midonet-agent \
   -v /:/rootfs:ro
   -v /sys:/sys:ro
   -v /var/lib/docker:/var/lib/docker:rw
