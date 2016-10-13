@@ -2,7 +2,6 @@
 set -x
 
 mkdir -p /etc/zookeeper/conf
-mkdir -p /var/lib/zookeeper
 
 # keep zookeeper in-memory for performance unless is set to false
 if [ "${ZK_IN_MEM}" != "false" ]; then
@@ -27,4 +26,7 @@ for MEMBER in $ZK_QUORUM; do
    echo "server.$ID=$HOST:2888:3888" >> /etc/zookeeper/conf/zoo.cfg
 done
 
-exec /sbin/init
+. /etc/zookeeper/conf/environment
+# Override this property to show the logs at the console
+ZOO_LOG4J_PROP=DEBUG,CONSOLE,ROOLINGFILE
+exec $JAVA "-Dzookeeper.root.logger=${ZOO_LOG4J_PROP}" -cp "$CLASSPATH" $JVMFLAGS $ZOOMAIN "$ZOOCFG"

@@ -16,4 +16,6 @@ ENV ZK_QUORUM="localhost:1" \
     ZK_IN_MEM="false"       \
     ZK_SYNC="no"
 
+VOLUME /var/lib/zookeeper
+
 CMD ["/run-zookeeper.sh"]
