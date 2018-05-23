@@ -1,0 +1,5 @@
+[cli]
+api_url = http://localhost:8181/midonet-api
+username = admin
+password = ADMIN_PASS
+project_id = admin

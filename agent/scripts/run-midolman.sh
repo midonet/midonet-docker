@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 HOST_ID_FILE="/etc/midonet_host_id.properties"
 
@@ -22,15 +22,49 @@ if [ ! -f $HOST_ID_FILE ] || [ "$(stat -c '%m' "$HOST_ID_FILE")" = "/" ]; then
     fi
 fi
 
-
 if [ "$TEMPLATE" != "compute.large" ]; then
     TEMPLATE_NAME="agent-$(echo "$TEMPLATE" | sed -e 's/\./-/')"
     mn-conf template-set -h local -t "$TEMPLATE_NAME"
     cp "/etc/midolman/midolman-env.sh.$TEMPLATE" /etc/midolman/midolman-env.sh
 fi
 
-sed -i '/exec >> \/var\/log\/midolman\/upstart-stderr.log/{N;d;}' \
-    /usr/share/midolman/midolman-start
+function do_midonet_command() {
+    echo "Calling : midonet-cli --midonet-url=$MIDONET_API_URL --no-auth --eval \"$@\" "
+ 
+    midonet-cli --midonet-url=$MIDONET_API_URL --no-auth --eval "$@" 
+}
 
-sh /usr/share/midolman/midolman-prepare
-sh /usr/share/midolman/midolman-start
+
+do_midonet_command tunnel-zone list || exit 1
+
+set -m
+
+echo "Running midolman-start ..."
+/usr/share/midolman/midolman-start &
+
+echo "Waiting ${INIT_WAIT_TIME}s to midolman to init ..."
+
+sleep $INIT_WAIT_TIME
+
+# add host to tunnel zone
+export TZONE_NAME="default-tz"
+
+do_midonet_command "tunnel-zone create name default-tz type vxlan"
+
+export TZONE_ID=$(do_midonet_command tunnel-zone list | grep $TZONE_NAME | cut -d' ' -f2)
+
+echo "The tunnel zone id is $TZONE_ID"
+
+export HOST_ID=$(grep ^host_uuid /etc/midonet_host_id.properties | cut -d'=' -f2)
+
+echo "The host id is $HOST_ID"
+
+echo "The host IP is $HOST_IP"
+
+echo "Adding host to tunnel zone"
+
+do_midonet_command tunnel-zone $TZONE_ID add member host $HOST_ID address $HOST_IP
+
+echo "Host added to tunnel zone"
+
+fg

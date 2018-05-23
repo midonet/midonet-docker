@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Update config file to point to ZK
 CLUSTER_ENV=/usr/share/midonet-cluster/midonet-cluster-env.sh
@@ -27,11 +27,11 @@ if [ ! -z "$KEYSTONE_URL" ]; then
    KEYSTONE_PORT=$(echo "$KS_HOST_AND_PORT" | cut -d ':' -f 2)
 fi
 
-if [ -n "$KEYSTONE_HOST" ] && [ -n "$KEYSTONE_PORT" ]; then
+if [ "$AUTH_PROVIDER" = "Keystone" ]; then
     echo "Keystone environment variables were set. Setting up Keystone"
     AUTH_CONF=$(cat <<EOF
 cluster.auth {
-    provider_class: org.midonet.cluster.auth.keystone.KeystoneService
+    provider_class: "org.midonet.cluster.auth.keystone.KeystoneService"
     admin_role: admin
     keystone.tenant_name: "$KEYSTONE_TENANT_NAME"
     keystone.admin_token: "$KEYSTONE_ADMIN_TOKEN"
@@ -41,24 +41,18 @@ cluster.auth {
 
 EOF
 )
-else
+elif [ "$AUTH_PROVIDER" = "Mock" ]; then
     echo "Using MockAuth provider instead of keystone as no container was linked."
-fi
-
-if [ "$C_SERVERS" != "" ]; then
-    echo "Configuring Cassandra for this MidoNet cluster..."
-    C_CONF=$(cat << EOF
-cassandra {
-    servers: "$C_SERVERS"
-    replication_factor: $C_FACTOR
-    cluster: midonet
+    AUTH_CONF=$(cat <<EOF
+cluster.auth {
+    provider_class: "org.midonet.cluster.auth.MockAuthService"
 }
 
 EOF
 )
 else
-    echo "No Cassandra configuration. It won't be configured."
-    C_CONF=""
+    echo "Unknown AUTH_PROVIDER: '$AUTH_PROVIDER': it must be either 'Keystone' or 'Mock'"
+    exit 1
 fi
 
 echo "Setting up the cluster configuration..."
@@ -94,7 +88,6 @@ echo "Setting up the cluster configuration..."
 
     $AUTH_CONF
 
-    $C_CONF
 EOF
 
 
@@ -102,4 +95,20 @@ if [ "$UUID" != "" ]; then
     echo "host_uuid=$UUID" > /etc/midonet_host_id.properties
 fi
 
-sh /usr/share/midonet-cluster/midonet-cluster-start
+
+set -m
+
+echo "Running midonet-cluster-start ..."
+
+sh  /usr/share/midonet-cluster/midonet-cluster-start &
+
+echo "Waiting ${INIT_WAIT_TIME}s to midolman to init ..."
+
+sleep $INIT_WAIT_TIME
+
+curl -d "{\"tenantId\": \"\", \"id\": \"${CLUSTER_ROUTER_UUID}\"}" -H "Content-Type: application/vnd.org.midonet.Router-v3+json" -H "X-Auth-Token: 00000000" -X POST ${MIDONET_API_URL}/routers
+
+echo "Cluster router added"
+
+fg
+
