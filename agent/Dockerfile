@@ -11,7 +11,7 @@ RUN set -xe \
   \
   && apt-get -qy install midolman --no-install-recommends \
   \
-  && apt-get -qy install python-midonetclient
+  && apt-get -qy install python-midonetclient curl
 
 ADD scripts/run-midolman.sh /agent
 

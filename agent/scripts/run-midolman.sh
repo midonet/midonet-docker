@@ -15,11 +15,16 @@ rm /usr/bin/wdog
 
 # Do not write things to /etc if the user mounted his own config
 if [ ! -f $HOST_ID_FILE ] || [ "$(stat -c '%m' "$HOST_ID_FILE")" = "/" ]; then
-
+    echo "Midonet Host ID file not found ${HOST_ID_FILE}"
     # if a UUID was not supplied, we'll get a new one with each `docker run`
     if [ "$UUID" != "" ]; then
-        echo "host_uuid=$UUID" > /etc/midonet_host_id.properties
+        echo "UUID=${UUID} given, using it"
+    else
+        echo "UUID not given, calculating one"
+        export UUID=$(hostname | md5sum | awk '{print $1}' | sed 's/\(........\)\(....\)\(....\)\(....\)\(............\)/\1-\2-\3-\4-\5/')
     fi
+    echo "Creating file /etc/midonet_host_id.properties with UUID=${UUID}"
+    echo "host_uuid=$UUID" > /etc/midonet_host_id.properties
 fi
 
 if [ "$TEMPLATE" != "compute.large" ]; then
@@ -39,21 +44,22 @@ do_midonet_command tunnel-zone list || exit 1
 
 set -m
 
-echo "Running midolman-start ..."
-/usr/share/midolman/midolman-start &
+echo "Running midolman-prepare ..."
+bash /usr/share/midolman/midolman-prepare
 
-echo "Waiting ${INIT_WAIT_TIME}s to midolman to init ..."
+touch /var/log/midolman/midolman.log
 
-sleep $INIT_WAIT_TIME
+echo "Running midolman-start in background ..."
+bash /usr/share/midolman/midolman-start &
+
+until curl ${MIDONET_API_URL}; do echo Waiting for Midonet API ...; sleep 2; done;
 
 # add host to tunnel zone
 export TZONE_NAME="default-tz"
 
-do_midonet_command "tunnel-zone create name default-tz type vxlan"
+echo "Trying to create tunnel zone in case it is not already created ..."
 
-export TZONE_ID=$(do_midonet_command tunnel-zone list | grep $TZONE_NAME | cut -d' ' -f2)
-
-echo "The tunnel zone id is $TZONE_ID"
+curl -d "{\"id\": \"${MIDONET_TUNNELZONE}\", \"name\": \"default-tz5\", \"type\": \"vxlan\" }" -H "Content-Type: application/vnd.org.midonet.TunnelZone-v1+json" -H "X-Auth-Token: 00000000" -X POST ${MIDONET_API_URL}/tunnel_zones
 
 export HOST_ID=$(grep ^host_uuid /etc/midonet_host_id.properties | cut -d'=' -f2)
 
@@ -63,8 +69,8 @@ echo "The host IP is $HOST_IP"
 
 echo "Adding host to tunnel zone"
 
-do_midonet_command tunnel-zone $TZONE_ID add member host $HOST_ID address $HOST_IP
+until do_midonet_command tunnel-zone ${MIDONET_TUNNELZONE} add member host $HOST_ID address $HOST_IP; do echo Retrying to add host to tunnel zone ...; sleep 2; done;
 
 echo "Host added to tunnel zone"
 
-fg
+tail -f -n +1 /var/log/midolman/midolman.log
