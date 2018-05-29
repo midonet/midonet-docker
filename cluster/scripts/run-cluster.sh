@@ -102,13 +102,10 @@ echo "Running midonet-cluster-start ..."
 
 sh  /usr/share/midonet-cluster/midonet-cluster-start &
 
-echo "Waiting ${INIT_WAIT_TIME}s to midolman to init ..."
-
-sleep $INIT_WAIT_TIME
+until curl ${MIDONET_API_URL}; do echo Waiting for Midonet API ...; sleep 2; done;
 
 curl -d "{\"tenantId\": \"\", \"id\": \"${CLUSTER_ROUTER_UUID}\"}" -H "Content-Type: application/vnd.org.midonet.Router-v3+json" -H "X-Auth-Token: 00000000" -X POST ${MIDONET_API_URL}/routers
 
 echo "Cluster router added"
 
-fg
-
+tail -f -n +1 /var/log/midonet-cluster/midonet-cluster.log
