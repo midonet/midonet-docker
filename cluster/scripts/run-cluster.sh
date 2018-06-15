@@ -104,6 +104,8 @@ sh  /usr/share/midonet-cluster/midonet-cluster-start &
 
 until curl ${MIDONET_API_URL}; do echo Waiting for Midonet API ...; sleep 2; done;
 
+# Use curl to workaround a limitation of midonet-cli.
+# See https://midonet.atlassian.net/browse/MNA-1287
 curl -d "{\"tenantId\": \"\", \"id\": \"${CLUSTER_ROUTER_UUID}\"}" -H "Content-Type: application/vnd.org.midonet.Router-v3+json" -H "X-Auth-Token: 00000000" -X POST ${MIDONET_API_URL}/routers
 
 echo "Cluster router added"
