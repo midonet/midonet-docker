@@ -59,6 +59,8 @@ export TZONE_NAME="default-tz"
 
 echo "Trying to create tunnel zone in case it is not already created ..."
 
+# Use curl to workaround a limitation of midonet-cli.
+# See https://midonet.atlassian.net/browse/MNA-1287
 curl -d "{\"id\": \"${MIDONET_TUNNELZONE}\", \"name\": \"default-tz5\", \"type\": \"vxlan\" }" -H "Content-Type: application/vnd.org.midonet.TunnelZone-v1+json" -H "X-Auth-Token: 00000000" -X POST ${MIDONET_API_URL}/tunnel_zones
 
 export HOST_ID=$(grep ^host_uuid /etc/midonet_host_id.properties | cut -d'=' -f2)
