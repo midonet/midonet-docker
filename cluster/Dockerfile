@@ -25,7 +25,6 @@ ENV KEYSTONE_PORT=35357
 ENV KEYSTONE_TENANT_NAME="admin"
 ENV KEYSTONE_ADMIN_TOKEN="admintoken"
 ENV UUID=""
-ENV INIT_WAIT_TIME="20"
 
 # Agent-related cluster level configuration
 ENV AGENT_LOG_LEVEL="INFO"
