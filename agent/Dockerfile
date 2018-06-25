@@ -19,7 +19,6 @@ EXPOSE 179
 ENV ZK_ENDPOINTS="127.0.0.1:2181"
 ENV TEMPLATE="compute.large"
 ENV UUID=""
-ENV INIT_WAIT_TIME="60"
 
 VOLUME /var/log/midolman
 
