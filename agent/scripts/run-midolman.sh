@@ -16,11 +16,11 @@ rm /usr/bin/wdog
 # Do not write things to /etc if the user mounted his own config
 if [ ! -f $HOST_ID_FILE ] || [ "$(stat -c '%m' "$HOST_ID_FILE")" = "/" ]; then
     echo "Midonet Host ID file not found ${HOST_ID_FILE}"
-    # if a UUID was not supplied, we'll get a new one with each `docker run`
+    # if a UUID was not supplied, we'll get a calculate one from the hostname
     if [ "$UUID" != "" ]; then
         echo "UUID=${UUID} given, using it"
     else
-        echo "UUID not given, calculating one"
+        echo "UUID not given, calculating it from $(hostname)"
         export UUID=$(hostname | md5sum | awk '{print $1}' | sed 's/\(........\)\(....\)\(....\)\(....\)\(............\)/\1-\2-\3-\4-\5/')
     fi
     echo "Creating file /etc/midonet_host_id.properties with UUID=${UUID}"
