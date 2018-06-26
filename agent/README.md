@@ -21,9 +21,10 @@ where:
 * ZK\_ENDPOINTS is a comma-separated list of all the ip:ports serving
   Apache Zookeeper.
 * UUID is an optional environment variable that allows you to spawn a container
-  that is identified with that uuid. If you tear it down and start it again
-  with the same UUID, it will take the place and configurations of the previous
-  one. If it is not passed, each container run will get a new uuid.
+  that is identified with that uuid. If it is not passed, it will be calculated
+  from the output of `hostname` command. If you tear it down and start it again
+  with the same UUID (or same hostname, if UUID not provided), it will take the
+  place and configurations of the previous one.
 * A volume is mounted to have the Cluster logs available in the host without
   having to enter the container.
 

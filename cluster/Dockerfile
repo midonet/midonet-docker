@@ -25,9 +25,6 @@ ENV KEYSTONE_PORT=35357
 ENV KEYSTONE_TENANT_NAME="admin"
 ENV KEYSTONE_ADMIN_TOKEN="admintoken"
 ENV UUID=""
-ENV CLUSTER_ROUTER_UUID="73302be0-4405-4cc6-a276-60b4cee1f5b9"
-ENV INIT_WAIT_TIME="20"
-ENV MIDONET_API_URL="http://localhost:8181/midonet-api"
 
 # Agent-related cluster level configuration
 ENV AGENT_LOG_LEVEL="INFO"
