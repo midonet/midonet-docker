@@ -1,0 +1,75 @@
+# This is a Dockerfile to generate a Midonet agent container for ARM64
+# architecture with limited functionality:
+#
+#  - No VPNaaS (to avoid dependency on libreswan for ARM64)
+#  - No IPv6 support (to avoid dependency on VPP for ARM64)
+#
+# This limitations could be removed once the corresponding packages are
+# available in Midonet repos.
+#
+# The dependency on libreswan and vpp packages is done by modifying the
+# resulting package from building midonet source at master branch.
+#
+# WARNING: this image is intented only for testing, do not use in production
+
+# Intermediate container to build protocol buffers
+FROM ubuntu:xenial as protobuf
+RUN apt update
+RUN apt install -qy wget build-essential
+RUN wget https://github.com/google/protobuf/releases/download/v2.6.1/protobuf-2.6.1.tar.gz && \
+    tar -xzf protobuf-2.6.1.tar.gz && cd protobuf-2.6.1 && \
+    ./configure && make && make install && ldconfig
+
+# Intermediate container to build midonet packages
+FROM protobuf as packager1
+RUN apt update && apt install --force-yes -y --no-install-recommends \
+    g++ make ruby-dev ruby rpm debsigs expect openjdk-8-jdk-headless \
+    autoconf python3-pip python-pip git && \
+    gem2.3 install fpm ronn && \
+    pip3 install setuptools && \
+    pip install setuptools && \
+    pip install simplejson
+RUN git clone https://github.com/midonet/midonet && cd midonet && \
+    ./gradlew clean debian -x test -x integration
+
+# Intermediate container to remove libreswan and vpp dependencies
+FROM packager1 as packager2
+RUN apt install -qy apt-utils binutils
+COPY --from=packager1 \
+    midonet/midonet-tools/build/packages/midonet-tools_*.deb \
+    midonet/midolman/build/packages/midolman_*.deb \
+    /
+RUN ar x midolman_*.deb && tar xzf control.tar.gz && \
+ sed -i 's/libreswan[^,]*, //' control && \
+ sed -i 's/, vpp//' control && \
+ tar --ignore-failed-read -cvzf control.tar.gz preinst postinst prerm postrm md5sums control && \
+ ar rcs midolman_*.deb debian-binary control.tar.gz data.tar.gz
+
+# Final container using generated packages
+FROM ubuntu:xenial
+MAINTAINER MidoNet (https://www.midonet.org)
+RUN set -xe \
+  \
+  && apt update -qy && apt install -qy apt-utils gdebi-core gnupg\
+  && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv \
+  E9996503AEB005066261D3F38DDA494E99143E75
+ADD conf/midonet.list /etc/apt/sources.list.d/midonet.list
+COPY --from=packager2 \
+    /midonet-tools_*.deb \
+    /midolman_*.deb \
+    /
+RUN gdebi -qn --option=no-install-recommends=true /midonet-tools_*.deb
+RUN gdebi -qn --option=no-install-recommends=true /midolman_*.deb
+
+ADD scripts/run-midolman.sh /agent
+
+# Expose bgpd port in case it is a gateway
+EXPOSE 179
+
+ENV ZK_ENDPOINTS="127.0.0.1:2181"
+ENV TEMPLATE="compute.large"
+ENV UUID=""
+
+VOLUME /var/log/midolman
+
+CMD ["/agent"]
