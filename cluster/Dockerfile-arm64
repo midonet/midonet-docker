@@ -1,0 +1,64 @@
+# This is a Dockerfile to generate a Midonet cluster container for ARM64
+#
+# WARNING: this image is intented only for testing, do not use in production
+
+# Intermediate container to build protocol buffers
+FROM ubuntu:xenial as protobuf
+RUN apt update
+RUN apt install -qy wget build-essential
+RUN wget https://github.com/google/protobuf/releases/download/v2.6.1/protobuf-2.6.1.tar.gz && \
+    tar -xzf protobuf-2.6.1.tar.gz && cd protobuf-2.6.1 && \
+    ./configure && make && make install && ldconfig
+
+# Intermediate container to build midonet packages
+FROM protobuf as packager1
+RUN apt update && apt install --force-yes -y --no-install-recommends \
+    g++ make ruby-dev ruby rpm debsigs expect openjdk-8-jdk-headless \
+    autoconf python3-pip python-pip git && \
+    gem2.3 install fpm ronn && \
+    pip3 install setuptools && \
+    pip install setuptools && \
+    pip install simplejson
+RUN git clone https://github.com/midonet/midonet && cd midonet && \
+    ./gradlew clean debian -x test -x integration
+
+# Final container using generated packages
+FROM ubuntu:xenial
+MAINTAINER MidoNet (https://www.midonet.org)
+RUN set -xe \
+  \
+  && apt update -qy && apt install -qy apt-utils gdebi-core gnupg curl \
+  && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv \
+  E9996503AEB005066261D3F38DDA494E99143E75
+ADD conf/midonet.list /etc/apt/sources.list.d/midonet.list
+COPY --from=packager1 \
+    /midonet/midonet-tools/build/packages/midonet-tools_*.deb \
+    /midonet/midonet-cluster/build/packages/midonet-cluster_*.deb \
+    /midonet/python-midonetclient/python-midonetclient_*.deb \
+    /
+RUN gdebi -qn /midonet-tools_*.deb
+RUN gdebi -qn /midonet-cluster_*.deb
+RUN gdebi -qn /python-midonetclient_*.deb
+
+ADD conf/midonetrc /root/.midonetrc
+
+ADD scripts/run-cluster.sh /cluster
+
+EXPOSE 8181
+
+ENV ZK_ENDPOINTS="127.0.0.1:2181"
+# Auth provider: 'Keystone' or 'Mock'
+ENV AUTH_PROVIDER="Keystone"
+ENV KEYSTONE_URL=""
+ENV KEYSTONE_HOST="127.0.0.1"
+ENV KEYSTONE_PORT=35357
+ENV KEYSTONE_TENANT_NAME="admin"
+ENV KEYSTONE_ADMIN_TOKEN="admintoken"
+ENV UUID=""
+
+# Agent-related cluster level configuration
+ENV AGENT_LOG_LEVEL="INFO"
+
+VOLUME /var/log/midonet-cluster
+
+CMD ["/cluster"]
