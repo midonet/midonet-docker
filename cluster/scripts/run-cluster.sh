@@ -61,31 +61,6 @@ echo "Setting up the cluster configuration..."
         zookeeper_hosts = "$ZK_ENDPOINTS"
     }
 
-    agent {
-        midolman {
-            bgp_keepalive: 1s
-            bgp_holdtime: 3s
-            bgp_connect_retry: 1s
-            lock_memory: true
-            simulation_threads: 2
-            output_channels: 2
-        }
-
-        datapath {
-            max_flow_count: 1500000
-            send_buffer_pool_max_size: 16384
-            send_buffer_pool_initial_size: 4096
-        }
-
-        loggers.root: $AGENT_LOG_LEVEL
-
-        haproxy_health_monitor {
-            namespace_cleanup: true
-            health_monitor_enable: true
-            haproxy_file_loc: /etc/midolman/l4lb/
-        }
-    }
-
     $AUTH_CONF
 
 EOF
