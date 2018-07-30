@@ -1,0 +1,2 @@
+deb http://builds.midonet.org/midonet-nightly unstable main
+deb http://builds.midonet.org/misc stable main
