@@ -52,6 +52,7 @@ RUN ar x midolman_*.deb && tar xzf control.tar.gz && \
 # Final container using generated packages
 FROM ubuntu:xenial
 MAINTAINER MidoNet (https://www.midonet.org)
+ARG DEBIAN_FRONTEND=noninteractive
 RUN set -xe \
   \
   && apt update -qy && apt install -qy apt-utils gdebi-core gnupg\
