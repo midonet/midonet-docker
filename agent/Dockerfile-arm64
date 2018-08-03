@@ -22,6 +22,8 @@ RUN wget https://github.com/google/protobuf/releases/download/v2.6.1/protobuf-2.
 
 # Intermediate container to build midonet packages
 FROM protobuf as packager1
+ARG MIDONET_REPO=https://github.com/midonet/midonet
+ARG MIDONET_COMMIT=master
 RUN apt update && apt install --force-yes -y --no-install-recommends \
     g++ make ruby-dev ruby rpm debsigs expect openjdk-8-jdk-headless \
     autoconf python3-pip python-pip git && \
@@ -29,7 +31,9 @@ RUN apt update && apt install --force-yes -y --no-install-recommends \
     pip3 install setuptools && \
     pip install setuptools && \
     pip install simplejson
-RUN git clone https://github.com/midonet/midonet && cd midonet && \
+RUN git clone $MIDONET_REPO && cd midonet && \
+    git fetch origin +refs/heads/*:refs/remotes/origin/* +refs/changes/*:refs/changes/* +refs/pull/*/head:refs/remotes/origin/pr/* && \
+    git checkout $MIDONET_COMMIT && \
     ./gradlew clean debian -x test -x integration
 
 # Intermediate container to remove libreswan and vpp dependencies
