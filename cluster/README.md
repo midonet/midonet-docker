@@ -35,8 +35,6 @@ where:
   having to enter the container.
 
 Other available options:
-* AGENT\_LOG\_LEVEL: which allows you to change the logging level that is used
-  by the MidoNet agents in the cluster. It defaults to 'INFO'.
 * C\_SERVERS: the comma-separated IPs of the cassandra servers in the cluster.
   If it is not provided, some MidoNet features like flow tracing will be
   disabled.
